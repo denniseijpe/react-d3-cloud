@@ -79,7 +79,7 @@ class WordCloud extends Component {
           .style('font-family', 'Impact')
           .style('fill', (d, i) => fill(i))
           .attr('text-anchor', 'middle')
-          .attr('transform',
+          .style('transform',
             d => `translate(${[d.x, d.y]})rotate(${d.rotate})`
           )
           .text(d => d.text);
