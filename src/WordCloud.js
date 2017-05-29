@@ -64,25 +64,47 @@ class WordCloud extends Component {
       .padding(padding)
       .rotate(rotate)
       .fontSize(fontSizeMapper)
-      .on('end', words => {
+      .on('end', (words, e) => {
+        window.wlen = words.length;
+        let sc = e ? Math.min(width / Math.abs(e[1].x - width / 2), width / Math.abs(e[0].x - width / 2), height / Math.abs(e[1].y - height / 2), height / Math.abs(e[0].y - height / 2)) / 2 : 1;
+
+        const newWords = []
+
+        for (var i = 0; i < words.length; i++) {
+          if (words[i].company) {
+            newWords.push({
+              ...words[i],
+              'id': words[i].id + 'czz',
+              'text': words[i].company,
+              'y': words[i].y + words[i].size / 1.6,
+              'size': words[i].size - 5,
+            })
+          }
+          newWords.push({...words[i]})
+        }
+
         d3.select(this.wordCloud)
           .append('svg')
           .attr('width', layout.size()[0])
           .attr('height', layout.size()[1])
           .append('g')
-          .attr('transform', `translate(${layout.size()[0] / 2},${layout.size()[1] / 2})`)
+          .attr('transform', `translate(${layout.size()[0] / 2},${layout.size()[1] / 2})scale(${sc})`)
           .selectAll('text')
-          .data(words)
+          .data(newWords)
           .enter()
           .append('text')
-          .style('font-size', d => `${d.size}px`)
-          .style('font-family', 'Impact')
-          .style('fill', (d, i) => fill(i))
-          .attr('text-anchor', 'middle')
-          .style('transform',
-            d => `translate(${[d.x, d.y]})rotate(${d.rotate})`
-          )
-          .text(d => d.text);
+            .style('font-size', d => `${d.size}px`)
+            .style('font-family', font)
+            .style('fill', (d, i) => fill(i))
+            .attr('text-anchor', 'middle')
+            .style('transform',
+              d => `translate(${d.x}px, ${d.y}px)`
+            )
+            .attr('transform',
+              d => `translate(${[d.x, d.y]})`
+            )
+            .attr('key', d => d.id)
+            .text(d => d.text);
       });
 
     layout.start();
